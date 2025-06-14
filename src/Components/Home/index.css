@@ -1,0 +1,52 @@
+*{
+    font-family: 'Inter';
+  }
+  
+  label{
+    width: 10rem;
+  }
+  
+  .containers{
+
+    display: block;
+    margin-top: 2%;
+
+  }
+  input{
+    border-radius: 8px;
+    padding: 5px;
+  }
+  .form{
+    display: flex;
+    padding: 0.5rem;
+  }
+ .Tabs{
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        
+        width: 50%;
+        border-radius: 10px;
+      }
+ .InsideTabs{
+        display: block;
+        justify-content: space-around;
+        align-items: center;
+        box-shadow: 0px 0px 6px 0px rgb(0,0.2,0.5,0.5);
+        width: 100%;
+        border-radius: 10px;
+        margin-top: 10px;
+        padding-left: 20%;
+        padding-top: 5%;
+        padding-bottom: 5%;
+      }
+
+  .submitButton{
+    padding: 2%;
+    background-color: #d32028;
+    color:white;
+    border-radius: 10px;
+    border:none;
+    margin-left:15%
+  }
+ 

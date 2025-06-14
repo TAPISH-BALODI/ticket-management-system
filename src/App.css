@@ -1,0 +1,47 @@
+.home-bg{
+  background-image: url("./Assets/images/homebg.svg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: auto;
+}
+.education-bg{
+  background-image: url("./Assets/images/banner.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  height: 18rem;
+  width: auto;
+   
+
+}
+
+body{
+  padding: 2%;
+  padding-left: 10%;
+  padding-right: 10%;
+}
+@media screen and (max-width: 767px) {
+  .education-bg{
+    background-image: url("./Assets/images/banner.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+  
+   
+    width: 100%;
+    border-radius: 35px;
+    text-align: left;
+  
+  }
+}
+.Slider-setting .slick-prev {
+  left: -34px;
+}
+
+.Slider-setting .slick-next {
+  right: -15px;
+}
+
+@media screen and (max-width: 600px) {
+  .Slider-setting .slick-prev {
+    left: -17px;
+  }
+}

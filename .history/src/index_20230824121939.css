@@ -1,0 +1,66 @@
+/* body {
+  margin: 0;
+  padding: 0;
+}
+
+@font-face {
+  font-family: Inter-Bold;
+  src: url("./Assets/fontfamily/Inter-Bold.ttf");
+}
+@font-face {
+  font-family: Inter-Medium;
+  src: url("./Assets/fontfamily/Inter-Medium.ttf");
+}
+@font-face {
+  font-family: Inter-Regular;
+  src: url("./Assets/fontfamily/Inter-Regular.ttf");
+}
+@font-face {
+  font-family: Inter-SemiBold;
+  src: url("./Assets/fontfamily/Inter-SemiBold.ttf");
+}
+
+@font-face {
+  font-family: Outfit-Bold;
+  src: url("./Assets/fontfamily/Outfit-Bold.ttf");
+}
+@font-face {
+  font-family: Outfit-Light;
+  src: url("./Assets/fontfamily/Outfit-Light.ttf");
+}
+@font-face {
+  font-family: Outfit-Medium;
+  src: url("./Assets/fontfamily/Outfit-Medium.ttf");
+}
+@font-face {
+  font-family: Outfit-Regular;
+  src: url("./Assets/fontfamily/Outfit-Regular.ttf");
+}
+@font-face {
+  font-family: Outfit-SemiBold;
+  src: url("./Assets/fontfamily/Outfit-SemiBold.ttf");
+}
+
+@import url("https://fonts.googleapis.com/css2?family=Outfit&display=swap");
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  margin: 0;
+  font-family: "Outfit", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button {
+  font-family: "Outfit", sans-serif;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+} */

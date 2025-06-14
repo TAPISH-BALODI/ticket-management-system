@@ -1,0 +1,40 @@
+.home-bg{
+  background-image: url("./Assets/images/homebg.svg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: auto;
+}
+.education-bg{
+  background-image: url("./Assets/images/FAQ_accordian.svg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: auto;
+  width: 100%;
+
+}
+@media screen and (max-width: 767px) {
+  .education-bg{
+    background-image: unset;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background:#000000;
+    height: auto;
+    width: 100%;
+    border-radius: 15px;
+    text-align: center;
+  
+  }
+}
+.Slider-setting .slick-prev {
+  left: -34px;
+}
+
+.Slider-setting .slick-next {
+  right: -15px;
+}
+
+@media screen and (max-width: 600px) {
+  .Slider-setting .slick-prev {
+    left: -17px;
+  }
+}
