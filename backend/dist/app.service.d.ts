@@ -33,10 +33,8 @@ export declare class AppService {
         _id: import("mongoose").Types.ObjectId;
     }>;
     getNextAgent(agents: Agents[]): Promise<Agents>;
-    createTicket(ticket: Tickets): Promise<(import("mongoose").Document<unknown, {}, Tickets> & Tickets & {
+    createTicket(ticket: Tickets): Promise<import("mongoose").Document<unknown, {}, Tickets> & Tickets & {
         _id: import("mongoose").Types.ObjectId;
-    }) | {
-        error: string;
     }>;
     getAgents(): Promise<(import("mongoose").Document<unknown, {}, Agents> & Agents & {
         _id: import("mongoose").Types.ObjectId;
@@ -44,5 +42,22 @@ export declare class AppService {
     getTickets(req: any, page?: number, pageSize?: number): Promise<(import("mongoose").Document<unknown, {}, Tickets> & Tickets & {
         _id: import("mongoose").Types.ObjectId;
     })[]>;
+    getTicketById(id: string): Promise<import("mongoose").Document<unknown, {}, Tickets> & Tickets & {
+        _id: import("mongoose").Types.ObjectId;
+    }>;
+    updateTicket(id: string, updates: Partial<Tickets>): Promise<import("mongoose").Document<unknown, {}, Tickets> & Tickets & {
+        _id: import("mongoose").Types.ObjectId;
+    }>;
+    updateTicketPosition(id: string, status: string, position: number): Promise<import("mongoose").Document<unknown, {}, Tickets> & Tickets & {
+        _id: import("mongoose").Types.ObjectId;
+    }>;
+    addComment(id: string, comment: any): Promise<import("mongoose").Document<unknown, {}, Tickets> & Tickets & {
+        _id: import("mongoose").Types.ObjectId;
+    }>;
+    migrateTicketStatuses(): Promise<{
+        success: boolean;
+        message: string;
+        migratedCount: number;
+    }>;
     getHello(): string;
 }

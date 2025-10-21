@@ -1,7 +1,6 @@
-body {
-  margin: 0;
-  padding: 0;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @font-face {
   font-family: Inter-Bold;
@@ -43,21 +42,94 @@ body {
 
 @import url("https://fonts.googleapis.com/css2?family=Outfit&display=swap");
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    @apply m-0 p-0 bg-gray-50;
+    font-family: "Outfit", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  button {
+    font-family: "Outfit", sans-serif;
+  }
 }
 
-body {
-  margin: 0;
-  font-family: "Outfit", sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+@layer components {
+  .glass-card {
+    @apply bg-white rounded-xl shadow-card border border-gray-200;
+  }
 
-button {
-  font-family: "Outfit", sans-serif;
+  .glass-card-strong {
+    @apply bg-white rounded-xl shadow-lg border border-gray-200;
+  }
+
+  .btn-primary {
+    @apply px-6 py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 hover:shadow-lg transform hover:scale-105 active:scale-95 transition-all duration-200;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 hover:shadow-md transform hover:scale-105 active:scale-95 transition-all duration-200;
+  }
+
+  .btn-ghost {
+    @apply px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all duration-200;
+  }
+
+  .badge {
+    @apply px-3 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1;
+  }
+
+  .badge-priority-urgent {
+    @apply bg-red-100 text-red-700 border border-red-300;
+  }
+
+  .badge-priority-high {
+    @apply bg-red-50 text-red-600 border border-red-200;
+  }
+
+  .badge-priority-medium {
+    @apply bg-yellow-100 text-yellow-700 border border-yellow-300;
+  }
+
+  .badge-priority-low {
+    @apply bg-gray-100 text-gray-600 border border-gray-300;
+  }
+
+  .ticket-card {
+    @apply bg-white rounded-lg p-4 shadow-card hover:shadow-card-hover cursor-pointer border border-gray-200 transition-all duration-200 hover:scale-[1.02];
+  }
+
+  .kanban-column {
+    @apply bg-gray-50 rounded-xl p-4 min-h-[500px] w-80 flex flex-col border border-gray-200;
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: rgba(156, 163, 175, 0.5);
+    border-radius: 20px;
+  }
 }
 
 code {

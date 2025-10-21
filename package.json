@@ -5,6 +5,7 @@
   "dependencies": {
     "@emotion/react": "^11.10.8",
     "@emotion/styled": "^11.10.8",
+    "@hello-pangea/dnd": "^18.0.1",
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.12.2",
     "@mui/styled-engine-sc": "^5.12.0",
@@ -21,17 +22,21 @@
     "axios": "^1.3.5",
     "bootstrap": "^5.2.3",
     "dotenv-webpack": "^8.0.1",
+    "framer-motion": "^12.23.24",
     "html-webpack-plugin": "^5.5.3",
     "jquery": "^3.6.3",
     "js-cookie": "^3.0.1",
     "jwt-decode": "^4.0.0",
+    "lucide-react": "^0.546.0",
     "mdb-react-ui-kit": "^5.1.0",
     "moment": "^2.29.4",
     "owl.carousel": "^2.3.4",
     "popper.js": "^1.16.1",
     "react": "^18.2.0",
+    "react-beautiful-dnd": "^13.1.1",
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.3",
+    "react-icons": "^5.5.0",
     "react-otp-input": "^3.0.4",
     "react-owl-carousel": "^2.3.3",
     "react-redux": "^8.1.2",
@@ -70,5 +75,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.1"
   }
 }

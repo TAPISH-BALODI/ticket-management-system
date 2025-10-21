@@ -36,18 +36,23 @@ let AppService = class AppService {
             const assignedAgent = await this.getNextAgent(availableAgents);
             await this.agentModel.findOneAndUpdate({ email: assignedAgent.email }, { $inc: { ticketCount: 1 } });
             ticket.assignedTo = assignedAgent.name;
-            ticket.status = "Assigned";
+            if (!ticket.status || ticket.status === 'New' || ticket.status === 'Assigned') {
+                ticket.status = "To Do";
+            }
             return await this.ticketModel.create(ticket);
         }
         else {
-            return { error: 'No active agents available' };
+            if (!ticket.status || ticket.status === 'New') {
+                ticket.status = "To Do";
+            }
+            return await this.ticketModel.create(ticket);
         }
     }
     async getAgents() {
         return await this.agentModel.find();
     }
     async getTickets(req, page = 1, pageSize = 10) {
-        const { status, assignedTo, severity, type, sortBy } = req.query;
+        const { status, assignedTo, severity, type, sortBy, sprint, priority } = req.query;
         let query = {};
         if (status)
             query.status = status;
@@ -57,15 +62,21 @@ let AppService = class AppService {
             query.severity = severity;
         if (type)
             query.type = type;
+        if (priority)
+            query.priority = priority;
+        if (sprint)
+            query['sprint.id'] = sprint;
         const sortOptions = {
             dateCreated: 1,
             resolvedOn: 1,
+            priority: 1,
+            position: 1
         };
         if (sortBy && sortOptions[sortBy]) {
             sortOptions[sortBy] = 'asc';
         }
         const skip = (page - 1) * pageSize;
-        console.log(query, "UQERY");
+        console.log(query, "QUERY");
         if (Object.keys(query).length > 0) {
             const supportTickets = await this.ticketModel.find(query)
                 .skip(skip)
@@ -83,6 +94,39 @@ let AppService = class AppService {
             console.log(supportTickets, "TICK");
             return supportTickets;
         }
+    }
+    async getTicketById(id) {
+        return await this.ticketModel.findById(id).exec();
+    }
+    async updateTicket(id, updates) {
+        updates['lastModified'] = new Date();
+        return await this.ticketModel.findByIdAndUpdate(id, updates, { new: true }).exec();
+    }
+    async updateTicketPosition(id, status, position) {
+        return await this.ticketModel.findByIdAndUpdate(id, { status, position, lastModified: new Date() }, { new: true }).exec();
+    }
+    async addComment(id, comment) {
+        return await this.ticketModel.findByIdAndUpdate(id, {
+            $push: { comments: { ...comment, createdAt: new Date() } },
+            lastModified: new Date()
+        }, { new: true }).exec();
+    }
+    async migrateTicketStatuses() {
+        const statusMapping = {
+            'New': 'To Do',
+            'Assigned': 'In Progress',
+            'Resolved': 'Done'
+        };
+        let migratedCount = 0;
+        for (const [oldStatus, newStatus] of Object.entries(statusMapping)) {
+            const result = await this.ticketModel.updateMany({ status: oldStatus }, { $set: { status: newStatus } }).exec();
+            migratedCount += result.modifiedCount || 0;
+        }
+        return {
+            success: true,
+            message: `Migrated ${migratedCount} tickets to new status values`,
+            migratedCount
+        };
     }
     getHello() {
         return 'Hello World!';

@@ -39,6 +39,33 @@ let AppController = class AppController {
             res.send({ status: 'failed', error });
         }
     }
+    async updateTicket(id, input, res, req) {
+        try {
+            let result = await this.appService.updateTicket(id, input);
+            res.send(result);
+        }
+        catch (error) {
+            res.send({ status: 'failed', error });
+        }
+    }
+    async updateTicketPosition(id, body, res) {
+        try {
+            let result = await this.appService.updateTicketPosition(id, body.status, body.position);
+            res.send(result);
+        }
+        catch (error) {
+            res.send({ status: 'failed', error });
+        }
+    }
+    async addComment(id, comment, res) {
+        try {
+            let result = await this.appService.addComment(id, comment);
+            res.send(result);
+        }
+        catch (error) {
+            res.send({ status: 'failed', error });
+        }
+    }
     async getAgents(res, req) {
         try {
             let result = await this.appService.getAgents();
@@ -52,6 +79,24 @@ let AppController = class AppController {
         try {
             console.log(req.query);
             let result = await this.appService.getTickets(req, req.query.page, req.query.pageSize);
+            res.send(result);
+        }
+        catch (error) {
+            res.send({ status: 'failed', error });
+        }
+    }
+    async getTicketById(id, res) {
+        try {
+            let result = await this.appService.getTicketById(id);
+            res.send(result);
+        }
+        catch (error) {
+            res.send({ status: 'failed', error });
+        }
+    }
+    async migrateTicketStatuses(res) {
+        try {
+            let result = await this.appService.migrateTicketStatuses();
             res.send(result);
         }
         catch (error) {
@@ -82,6 +127,34 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AppController.prototype, "createTicket", null);
 __decorate([
+    (0, common_1.Put)('tickets/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Res)()),
+    __param(3, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object, Object, Object]),
+    __metadata("design:returntype", Promise)
+], AppController.prototype, "updateTicket", null);
+__decorate([
+    (0, common_1.Patch)('tickets/:id/position'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object, Object]),
+    __metadata("design:returntype", Promise)
+], AppController.prototype, "updateTicketPosition", null);
+__decorate([
+    (0, common_1.Post)('tickets/:id/comments'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object, Object]),
+    __metadata("design:returntype", Promise)
+], AppController.prototype, "addComment", null);
+__decorate([
     (0, common_1.Get)('all-agents'),
     __param(0, (0, common_1.Res)()),
     __param(1, (0, common_1.Req)()),
@@ -97,6 +170,21 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], AppController.prototype, "getTickets", null);
+__decorate([
+    (0, common_1.Get)('tickets/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], AppController.prototype, "getTicketById", null);
+__decorate([
+    (0, common_1.Post)('migrate-ticket-statuses'),
+    __param(0, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AppController.prototype, "migrateTicketStatuses", null);
 __decorate([
     (0, common_1.Get)(),
     __metadata("design:type", Function),

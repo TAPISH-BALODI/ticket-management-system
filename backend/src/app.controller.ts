@@ -1,4 +1,4 @@
-import { Controller, Get,Post,Body,Res,Req } from '@nestjs/common';
+import { Controller, Get, Post, Put, Patch, Body, Res, Req, Param } from '@nestjs/common';
 import { AppService } from './app.service';
 
 import {Agents} from './types/Agents';
@@ -32,6 +32,35 @@ export class AppController {
     }
   }
 
+  @Put('tickets/:id')
+  async updateTicket(@Param('id') id: string, @Body() input: Partial<Tickets>, @Res() res, @Req() req) {
+    try {
+      let result = await this.appService.updateTicket(id, input);
+      res.send(result);
+    } catch (error) {
+      res.send({status:'failed', error});
+    }
+  }
+
+  @Patch('tickets/:id/position')
+  async updateTicketPosition(@Param('id') id: string, @Body() body: {status: string, position: number}, @Res() res) {
+    try {
+      let result = await this.appService.updateTicketPosition(id, body.status, body.position);
+      res.send(result);
+    } catch (error) {
+      res.send({status:'failed', error});
+    }
+  }
+
+  @Post('tickets/:id/comments')
+  async addComment(@Param('id') id: string, @Body() comment: any, @Res() res) {
+    try {
+      let result = await this.appService.addComment(id, comment);
+      res.send(result);
+    } catch (error) {
+      res.send({status:'failed', error});
+    }
+  }
 
   @Get('all-agents')
  async getAgents(@Res() res,@Req() req) {
@@ -62,6 +91,25 @@ export class AppController {
   
   }
 
+  @Get('tickets/:id')
+  async getTicketById(@Param('id') id: string, @Res() res) {
+    try {
+      let result = await this.appService.getTicketById(id);
+      res.send(result);
+    } catch (error) {
+      res.send({status:'failed', error});
+    }
+  }
+
+  @Post('migrate-ticket-statuses')
+  async migrateTicketStatuses(@Res() res) {
+    try {
+      let result = await this.appService.migrateTicketStatuses();
+      res.send(result);
+    } catch (error) {
+      res.send({status:'failed', error});
+    }
+  }
 
   @Get()
   getHello(): string {

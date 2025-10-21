@@ -6,7 +6,15 @@ export declare class AppController {
     constructor(appService: AppService);
     createAgent(input: Agents, res: any, req: any): Promise<void>;
     createTicket(input: Tickets, res: any, req: any): Promise<void>;
+    updateTicket(id: string, input: Partial<Tickets>, res: any, req: any): Promise<void>;
+    updateTicketPosition(id: string, body: {
+        status: string;
+        position: number;
+    }, res: any): Promise<void>;
+    addComment(id: string, comment: any, res: any): Promise<void>;
     getAgents(res: any, req: any): Promise<void>;
     getTickets(res: any, req: any): Promise<void>;
+    getTicketById(id: string, res: any): Promise<void>;
+    migrateTicketStatuses(res: any): Promise<void>;
     getHello(): string;
 }

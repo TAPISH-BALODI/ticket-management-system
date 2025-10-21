@@ -34,12 +34,19 @@ async getNextAgent(agents:Agents[]) {
        const assignedAgent = await this.getNextAgent(availableAgents) as Agents;
     await this.agentModel.findOneAndUpdate({email:assignedAgent.email}, { $inc: { ticketCount: 1 } });
       ticket.assignedTo=assignedAgent.name
-      ticket.status="Assigned"
+      // Set to "In Progress" if assigned, or keep status from frontend
+      if(!ticket.status || ticket.status === 'New' || ticket.status === 'Assigned') {
+        ticket.status = "To Do" as any;
+      }
       return await this.ticketModel.create(ticket)
     }
     else
     {
-      return { error: 'No active agents available' };
+      // If no agents available, keep as "To Do"
+      if(!ticket.status || ticket.status === 'New') {
+        ticket.status = "To Do" as any;
+      }
+      return await this.ticketModel.create(ticket);
     }
    
   }
@@ -50,23 +57,27 @@ async getNextAgent(agents:Agents[]) {
 
   async getTickets(req:any, page: number = 1, pageSize: number = 10) {
 
-   const { status, assignedTo, severity, type, sortBy } = req.query;
-    let query={} as Tickets;
+   const { status, assignedTo, severity, type, sortBy, sprint, priority } = req.query;
+    let query={} as any;
 
     if (status) query.status = status
     if (assignedTo) query.assignedTo = assignedTo
     if (severity) query.severity = severity
     if (type) query.type = type
+    if (priority) query.priority = priority
+    if (sprint) query['sprint.id'] = sprint
 
     const sortOptions = {
       dateCreated: 1, // Default sorting by dateCreated in ascending order
       resolvedOn: 1,
+      priority: 1,
+      position: 1
     }
     if (sortBy && sortOptions[sortBy]) {
       sortOptions[sortBy] = 'asc'
     }
     const skip = (page - 1) * pageSize;
-    console.log(query,"UQERY")
+    console.log(query,"QUERY")
     if(Object.keys(query).length>0)
     {
 
@@ -94,7 +105,61 @@ async getNextAgent(agents:Agents[]) {
 
   }
 
+  async getTicketById(id: string) {
+    return await this.ticketModel.findById(id).exec();
+  }
 
+  async updateTicket(id: string, updates: Partial<Tickets>) {
+    updates['lastModified'] = new Date() as any;
+    return await this.ticketModel.findByIdAndUpdate(id, updates, { new: true }).exec();
+  }
+
+  async updateTicketPosition(id: string, status: string, position: number) {
+    return await this.ticketModel.findByIdAndUpdate(
+      id, 
+      { status, position, lastModified: new Date() as any }, 
+      { new: true }
+    ).exec();
+  }
+
+  async addComment(id: string, comment: any) {
+    return await this.ticketModel.findByIdAndUpdate(
+      id,
+      { 
+        $push: { comments: { ...comment, createdAt: new Date() } },
+        lastModified: new Date() as any
+      },
+      { new: true }
+    ).exec();
+  }
+
+  async migrateTicketStatuses() {
+    // Migrate old status values to new ones
+    // Old: New, Assigned, Resolved
+    // New: To Do, In Progress, In Review, Done
+    
+    const statusMapping = {
+      'New': 'To Do',
+      'Assigned': 'In Progress',
+      'Resolved': 'Done'
+    };
+
+    let migratedCount = 0;
+
+    for (const [oldStatus, newStatus] of Object.entries(statusMapping)) {
+      const result = await this.ticketModel.updateMany(
+        { status: oldStatus },
+        { $set: { status: newStatus } }
+      ).exec();
+      migratedCount += result.modifiedCount || 0;
+    }
+
+    return { 
+      success: true, 
+      message: `Migrated ${migratedCount} tickets to new status values`,
+      migratedCount 
+    };
+  }
 
    getHello():string {
     return 'Hello World!';
