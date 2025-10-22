@@ -24,11 +24,11 @@
 /// <reference types="mongoose/types/inferschematype" />
 import * as mongoose from 'mongoose';
 export declare const TicketsSchema: mongoose.Schema<any, mongoose.Model<any, any, any, any, any, any>, {}, {}, {}, {}, mongoose.DefaultSchemaOptions, {
+    type: string;
     description: string;
     dateCreated: Date;
     topic: string;
     severity: string;
-    type: string;
     status: string;
     priority: string;
     tags: string[];
@@ -57,11 +57,11 @@ export declare const TicketsSchema: mongoose.Schema<any, mongoose.Model<any, any
     };
     createdBy?: string;
 }, mongoose.Document<unknown, {}, mongoose.FlatRecord<{
+    type: string;
     description: string;
     dateCreated: Date;
     topic: string;
     severity: string;
-    type: string;
     status: string;
     priority: string;
     tags: string[];
@@ -90,11 +90,11 @@ export declare const TicketsSchema: mongoose.Schema<any, mongoose.Model<any, any
     };
     createdBy?: string;
 }>> & mongoose.FlatRecord<{
+    type: string;
     description: string;
     dateCreated: Date;
     topic: string;
     severity: string;
-    type: string;
     status: string;
     priority: string;
     tags: string[];
