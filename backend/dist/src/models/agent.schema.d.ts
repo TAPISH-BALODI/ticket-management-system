@@ -27,26 +27,26 @@ export declare const AgentsSchema: mongoose.Schema<any, mongoose.Model<any, any,
     name: string;
     email: string;
     phone: string;
-    description: string;
-    active: boolean;
-    dateCreated: string;
     ticketCount: number;
+    description?: string;
+    active?: boolean;
+    dateCreated?: string;
 }, mongoose.Document<unknown, {}, mongoose.FlatRecord<{
     name: string;
     email: string;
     phone: string;
-    description: string;
-    active: boolean;
-    dateCreated: string;
     ticketCount: number;
+    description?: string;
+    active?: boolean;
+    dateCreated?: string;
 }>> & mongoose.FlatRecord<{
     name: string;
     email: string;
     phone: string;
-    description: string;
-    active: boolean;
-    dateCreated: string;
     ticketCount: number;
+    description?: string;
+    active?: boolean;
+    dateCreated?: string;
 }> & {
     _id: mongoose.Types.ObjectId;
 }>;

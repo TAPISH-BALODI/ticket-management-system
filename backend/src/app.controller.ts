@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Patch, Body, Res, Req, Param } from '@nestjs/common';
+import { Controller, Get, Post, Put, Patch, Delete, Body, Res, Req, Param } from '@nestjs/common';
 import { AppService } from './app.service';
 
 import {Agents} from './types/Agents';
@@ -18,6 +18,26 @@ export class AppController {
       res.send({status:'failed',error})
     }
     
+  }
+
+  @Put('support-agents/:id')
+  async updateAgent(@Param('id') id: string, @Body() input: Partial<Agents>, @Res() res, @Req() req) {
+    try {
+      let result = await this.appService.updateAgent(id, input);
+      res.send(result);
+    } catch (error) {
+      res.send({status:'failed', error});
+    }
+  }
+
+  @Delete('support-agents/:id')
+  async deleteAgent(@Param('id') id: string, @Res() res, @Req() req) {
+    try {
+      let result = await this.appService.deleteAgent(id);
+      res.send(result);
+    } catch (error) {
+      res.send({status:'failed', error});
+    }
   }
 
 

@@ -30,6 +30,24 @@ let AppController = class AppController {
             res.send({ status: 'failed', error });
         }
     }
+    async updateAgent(id, input, res, req) {
+        try {
+            let result = await this.appService.updateAgent(id, input);
+            res.send(result);
+        }
+        catch (error) {
+            res.send({ status: 'failed', error });
+        }
+    }
+    async deleteAgent(id, res, req) {
+        try {
+            let result = await this.appService.deleteAgent(id);
+            res.send(result);
+        }
+        catch (error) {
+            res.send({ status: 'failed', error });
+        }
+    }
     async createTicket(input, res, req) {
         try {
             let result = await this.appService.createTicket(input);
@@ -117,6 +135,25 @@ __decorate([
     __metadata("design:paramtypes", [Agents_1.Agents, Object, Object]),
     __metadata("design:returntype", Promise)
 ], AppController.prototype, "createAgent", null);
+__decorate([
+    (0, common_1.Put)('support-agents/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Res)()),
+    __param(3, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object, Object, Object]),
+    __metadata("design:returntype", Promise)
+], AppController.prototype, "updateAgent", null);
+__decorate([
+    (0, common_1.Delete)('support-agents/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Res)()),
+    __param(2, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object, Object]),
+    __metadata("design:returntype", Promise)
+], AppController.prototype, "deleteAgent", null);
 __decorate([
     (0, common_1.Post)('support-tickets'),
     __param(0, (0, common_1.Body)()),

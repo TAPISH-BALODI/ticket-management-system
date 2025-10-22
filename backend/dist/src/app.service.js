@@ -22,7 +22,20 @@ let AppService = class AppService {
         this.ticketModel = ticketModel;
     }
     async createAgents(agent) {
-        return await this.agentModel.create(agent);
+        const agentData = {
+            ...agent,
+            dateCreated: agent.dateCreated || new Date().toISOString(),
+            active: agent.active !== undefined ? agent.active : true,
+            description: agent.description || 'No description provided',
+            ticketCount: agent.ticketCount || 0
+        };
+        return await this.agentModel.create(agentData);
+    }
+    async updateAgent(id, agentData) {
+        return await this.agentModel.findByIdAndUpdate(id, agentData, { new: true });
+    }
+    async deleteAgent(id) {
+        return await this.agentModel.findByIdAndDelete(id);
     }
     async getNextAgent(agents) {
         const agentWithLeastLoad = agents.reduce((minAgent, curAgent) => {

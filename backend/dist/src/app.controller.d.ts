@@ -5,6 +5,8 @@ export declare class AppController {
     private readonly appService;
     constructor(appService: AppService);
     createAgent(input: Agents, res: any, req: any): Promise<void>;
+    updateAgent(id: string, input: Partial<Agents>, res: any, req: any): Promise<void>;
+    deleteAgent(id: string, res: any, req: any): Promise<void>;
     createTicket(input: Tickets, res: any, req: any): Promise<void>;
     updateTicket(id: string, input: Partial<Tickets>, res: any, req: any): Promise<void>;
     updateTicketPosition(id: string, body: {

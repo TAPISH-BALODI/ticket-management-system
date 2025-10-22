@@ -17,7 +17,23 @@ export class AppService {
   ){}
 
   async createAgents(agent:Agents) {
-    return await this.agentModel.create(agent)
+    // Add required fields with defaults if not provided
+    const agentData = {
+      ...agent,
+      dateCreated: agent.dateCreated || new Date().toISOString(),
+      active: agent.active !== undefined ? agent.active : true,
+      description: agent.description || 'No description provided',
+      ticketCount: agent.ticketCount || 0
+    };
+    return await this.agentModel.create(agentData)
+  }
+
+  async updateAgent(id: string, agentData: Partial<Agents>) {
+    return await this.agentModel.findByIdAndUpdate(id, agentData, { new: true });
+  }
+
+  async deleteAgent(id: string) {
+    return await this.agentModel.findByIdAndDelete(id);
   }
 
 async getNextAgent(agents:Agents[]) {

@@ -32,6 +32,12 @@ export declare class AppService {
     createAgents(agent: Agents): Promise<import("mongoose").Document<unknown, {}, Agents> & Agents & {
         _id: import("mongoose").Types.ObjectId;
     }>;
+    updateAgent(id: string, agentData: Partial<Agents>): Promise<import("mongoose").Document<unknown, {}, Agents> & Agents & {
+        _id: import("mongoose").Types.ObjectId;
+    }>;
+    deleteAgent(id: string): Promise<import("mongoose").Document<unknown, {}, Agents> & Agents & {
+        _id: import("mongoose").Types.ObjectId;
+    }>;
     getNextAgent(agents: Agents[]): Promise<Agents>;
     createTicket(ticket: Tickets): Promise<import("mongoose").Document<unknown, {}, Tickets> & Tickets & {
         _id: import("mongoose").Types.ObjectId;
