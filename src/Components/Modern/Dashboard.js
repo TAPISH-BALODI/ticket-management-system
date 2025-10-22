@@ -392,7 +392,7 @@ const Dashboard = () => {
                   <p className="text-sm text-gray-600">{ticket.assignedTo || 'Unassigned'}</p>
                 </div>
               </div>
-              <span className={`badge badge-priority-${ticket.priority?.toLowerCase() || 'medium'}`}>
+              <span className={`badge badge-priority-${ticket.priority?.toLowerCase() || 'medium'}`} style={{color:"#000"}}>
                 {ticket.status}
               </span>
             </motion.div>

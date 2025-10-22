@@ -105,7 +105,7 @@ const TicketDetailModal = ({ ticket, isOpen, onClose, onUpdate, agents }) => {
                   )}
                   
                   <div className="flex flex-wrap gap-2 items-center">
-                    <span className={`badge badge-priority-${editedTicket.priority?.toLowerCase() || 'medium'}`}>
+                    <span className={`badge badge-priority-${editedTicket.priority?.toLowerCase() || 'medium'}`} style={{color:"#000"}}>
                       <FiAlertCircle className="text-xs" />
                       {editedTicket.priority || 'Medium'}
                     </span>
@@ -225,7 +225,7 @@ const TicketDetailModal = ({ ticket, isOpen, onClose, onUpdate, agents }) => {
                     </select>
                   ) : (
                     <div className="glass-card p-3">
-                      <span className={`badge badge-priority-${editedTicket.priority?.toLowerCase() || 'medium'}`}>
+                      <span className={`badge badge-priority-${editedTicket.priority?.toLowerCase() || 'medium'}`} style={{color:"#000"}}>
                         {editedTicket.priority || 'Medium'}
                       </span>
                     </div>

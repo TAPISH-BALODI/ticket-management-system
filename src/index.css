@@ -40,7 +40,8 @@
   src: url("./Assets/fontfamily/Outfit-SemiBold.ttf");
 }
 
-@import url("https://fonts.googleapis.com/css2?family=Outfit&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
 
 @layer base {
   * {
@@ -48,15 +49,25 @@
   }
 
   body {
-    @apply m-0 p-0 bg-gray-50;
-    font-family: "Outfit", sans-serif;
+    @apply m-0 p-0 bg-gray-50 font-sans;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     min-height: 100vh;
+    letter-spacing: -0.011em;
   }
 
   button {
-    font-family: "Outfit", sans-serif;
+    @apply font-sans;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-sans;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  input, textarea, select {
+    @apply font-sans;
   }
 }
 

@@ -264,7 +264,7 @@ const KanbanBoard = () => {
                             >
                               {/* Priority Badge */}
                               <div className="flex items-center justify-between mb-2">
-                                <span className={`badge badge-priority-${ticket.priority?.toLowerCase() || 'medium'}`}>
+                                <span className={`badge badge-priority-${ticket.priority?.toLowerCase() || 'medium'}`} style={{color:"#000"}}>
                                   {ticket.priority || 'Medium'}
                                 </span>
                                 <div className={`w-2 h-2 rounded-full ${getPriorityColor(ticket.priority)}`} />
