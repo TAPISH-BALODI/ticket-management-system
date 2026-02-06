@@ -75,45 +75,48 @@ const SprintManagement = () => {
     const generated = [];
 
     if (selectedSprintType === 'weekly') {
-      // Generate 4 weeks
-      for (let i = 0; i < 4; i++) {
+      // Generate 8 weeks: 4 past + current + 3 future
+      for (let i = -4; i < 4; i++) {
         const start = moment().add(i, 'weeks').startOf('week');
         const end = moment().add(i, 'weeks').endOf('week');
+        const label = i < 0 ? `${Math.abs(i)} weeks ago` : i === 0 ? 'This Week' : i === 1 ? 'Next Week' : `Week +${i}`;
         generated.push({
           id: `week-${i}`,
-          name: `Week ${i + 1} - ${start.format('MMM DD')}`,
+          name: `${label} - ${start.format('MMM DD')}`,
           startDate: start.toDate(),
           endDate: end.toDate(),
           type: 'weekly',
-          isActive: now.isBetween(start, end)
+          isActive: now.isBetween(start, end, null, '[]')
         });
       }
     } else if (selectedSprintType === 'monthly') {
-      // Generate 3 months
-      for (let i = 0; i < 3; i++) {
+      // Generate 6 months: 3 past + current + 2 future
+      for (let i = -3; i < 3; i++) {
         const start = moment().add(i, 'months').startOf('month');
         const end = moment().add(i, 'months').endOf('month');
+        const label = i < 0 ? `${Math.abs(i)} months ago` : i === 0 ? 'This Month' : i === 1 ? 'Next Month' : `Month +${i}`;
         generated.push({
           id: `month-${i}`,
-          name: start.format('MMMM YYYY'),
+          name: i === 0 ? start.format('MMMM YYYY') : `${label} (${start.format('MMM YYYY')})`,
           startDate: start.toDate(),
           endDate: end.toDate(),
           type: 'monthly',
-          isActive: now.isBetween(start, end)
+          isActive: now.isBetween(start, end, null, '[]')
         });
       }
     } else if (selectedSprintType === 'quarterly') {
-      // Generate 2 quarters
-      for (let i = 0; i < 2; i++) {
+      // Generate 4 quarters: 2 past + current + 1 future
+      for (let i = -2; i < 2; i++) {
         const start = moment().add(i * 3, 'months').startOf('quarter');
         const end = moment().add(i * 3, 'months').endOf('quarter');
+        const label = i < 0 ? `${Math.abs(i)} quarters ago` : i === 0 ? 'This Quarter' : 'Next Quarter';
         generated.push({
           id: `quarter-${i}`,
-          name: `Q${start.quarter()} ${start.format('YYYY')}`,
+          name: `${label} - Q${start.quarter()} ${start.format('YYYY')}`,
           startDate: start.toDate(),
           endDate: end.toDate(),
           type: 'quarterly',
-          isActive: now.isBetween(start, end)
+          isActive: now.isBetween(start, end, null, '[]')
         });
       }
     }
@@ -123,34 +126,36 @@ const SprintManagement = () => {
 
   const getSprintTickets = (sprint) => {
     if (!tickets || tickets.length === 0) {
-      console.log('SprintManagement: No tickets available');
       return [];
     }
     
-    console.log('SprintManagement: Processing', tickets.length, 'tickets for sprint', sprint.name);
-    
     return tickets.filter(ticket => {
       if (!ticket.dateCreated) {
-        console.log('SprintManagement: Ticket missing dateCreated:', ticket._id, ticket.topic);
         return false;
       }
       
       try {
         // Handle both Date objects and ISO strings
-        const ticketDate = moment(ticket.dateCreated);
-        const startDate = moment(sprint.startDate);
-        const endDate = moment(sprint.endDate);
+        let ticketDate = moment(ticket.dateCreated);
+        
+        // If it's a string, try parsing it
+        if (typeof ticket.dateCreated === 'string') {
+          ticketDate = moment(ticket.dateCreated);
+        }
+        
+        const startDate = moment(sprint.startDate).startOf('day');
+        const endDate = moment(sprint.endDate).endOf('day');
         
         if (!ticketDate.isValid()) {
-          console.log('SprintManagement: Invalid ticket date:', ticket.dateCreated);
           return false;
         }
         
-        const isInSprint = ticketDate.isBetween(startDate, endDate, null, '[]');
+        // Normalize ticket date to start of day for comparison
+        const ticketDateNormalized = ticketDate.startOf('day');
         
-        if (isInSprint) {
-          console.log('SprintManagement: Ticket matched sprint:', ticket.topic, 'Date:', ticketDate.format('YYYY-MM-DD'));
-        }
+        // Check if ticket date is between sprint dates (inclusive)
+        const isInSprint = ticketDateNormalized.isSameOrAfter(startDate) && 
+                          ticketDateNormalized.isSameOrBefore(endDate);
         
         return isInSprint;
       } catch (error) {
@@ -292,15 +297,22 @@ const SprintManagement = () => {
                   return false;
                 }
                 try {
-                  const ticketDate = moment(ticket.dateCreated);
+                  let ticketDate = moment(ticket.dateCreated);
+                  if (typeof ticket.dateCreated === 'string') {
+                    ticketDate = moment(ticket.dateCreated);
+                  }
+                  
                   if (!ticketDate.isValid()) {
                     return false;
                   }
                   
+                  const ticketDateNormalized = ticketDate.startOf('day');
+                  
                   const matches = sprints.some(sprint => {
-                    const startDate = moment(sprint.startDate);
-                    const endDate = moment(sprint.endDate);
-                    return ticketDate.isBetween(startDate, endDate, null, '[]');
+                    const startDate = moment(sprint.startDate).startOf('day');
+                    const endDate = moment(sprint.endDate).endOf('day');
+                    return ticketDateNormalized.isSameOrAfter(startDate) && 
+                           ticketDateNormalized.isSameOrBefore(endDate);
                   });
                   
                   return matches;

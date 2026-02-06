@@ -2,12 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   FiUsers, FiPlus, FiMail, FiPhone, FiEdit, FiTrash2,
-  FiCheckCircle
+  FiCheckCircle, FiClock, FiAlertTriangle, FiTrendingUp
 } from 'react-icons/fi';
 import axios from 'axios';
+import eventBus from '../../utils/eventBus';
+import * as moment from 'moment';
 
 const AgentsView = () => {
   const [agents, setAgents] = useState([]);
+  const [tickets, setTickets] = useState([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedAgent, setSelectedAgent] = useState(null);
@@ -22,7 +25,28 @@ const AgentsView = () => {
 
   useEffect(() => {
     fetchAgents();
+    fetchTickets();
+    
+    // Listen for ticket updates
+    const handleTicketUpdate = () => {
+      fetchTickets();
+    };
+    
+    eventBus.on('ticketsUpdated', handleTicketUpdate);
+    
+    return () => {
+      eventBus.off('ticketsUpdated', handleTicketUpdate);
+    };
   }, []);
+
+  const fetchTickets = async () => {
+    try {
+      const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/all-tickets`);
+      setTickets(response.data);
+    } catch (error) {
+      console.error('Error fetching tickets:', error);
+    }
+  };
 
   const fetchAgents = async () => {
     try {
@@ -118,6 +142,86 @@ const AgentsView = () => {
     }
   };
 
+  // Calculate workload for an agent
+  const calculateWorkload = (agentName) => {
+    // Get all tickets assigned to this agent (excluding Done status)
+    const agentTickets = tickets.filter(t => 
+      t.assignedTo === agentName && t.status !== 'Done'
+    );
+
+    // Priority weights
+    const priorityWeights = {
+      'Urgent': 4,
+      'High': 3,
+      'Medium': 2,
+      'Low': 1
+    };
+
+    // Calculate weighted ticket count
+    const weightedTickets = agentTickets.reduce((sum, ticket) => {
+      const weight = priorityWeights[ticket.priority] || 1;
+      const hoursWeight = ticket.estimatedHours ? ticket.estimatedHours / 8 : 1; // Normalize to 8-hour days
+      return sum + (weight * hoursWeight);
+    }, 0);
+
+    // Get weekly tickets (created this week)
+    const weekAgo = moment().subtract(7, 'days');
+    const weeklyTickets = agentTickets.filter(t => 
+      moment(t.dateCreated).isAfter(weekAgo)
+    );
+
+    // Calculate weekly workload score
+    const weeklyWeighted = weeklyTickets.reduce((sum, ticket) => {
+      const weight = priorityWeights[ticket.priority] || 1;
+      const hoursWeight = ticket.estimatedHours ? ticket.estimatedHours / 8 : 1;
+      return sum + (weight * hoursWeight);
+    }, 0);
+
+    // Calculate total estimated hours
+    const totalHours = agentTickets.reduce((sum, t) => sum + (t.estimatedHours || 0), 0);
+    const weeklyHours = weeklyTickets.reduce((sum, t) => sum + (t.estimatedHours || 0), 0);
+
+    // Calculate workload percentage (assuming 40 hours/week capacity)
+    // Base calculation: weighted tickets / expected capacity
+    const weeklyCapacity = 40; // hours per week
+    const workloadPercentage = Math.min((weeklyWeighted / weeklyCapacity) * 100, 150); // Cap at 150%
+
+    // Determine workload status
+    let workloadStatus = 'low';
+    let workloadColor = 'green';
+    if (workloadPercentage >= 100) {
+      workloadStatus = 'overloaded';
+      workloadColor = 'red';
+    } else if (workloadPercentage >= 75) {
+      workloadStatus = 'high';
+      workloadColor = 'orange';
+    } else if (workloadPercentage >= 50) {
+      workloadStatus = 'medium';
+      workloadColor = 'yellow';
+    }
+
+    // Priority breakdown
+    const priorityBreakdown = {
+      urgent: agentTickets.filter(t => t.priority === 'Urgent').length,
+      high: agentTickets.filter(t => t.priority === 'High').length,
+      medium: agentTickets.filter(t => t.priority === 'Medium').length,
+      low: agentTickets.filter(t => t.priority === 'Low').length
+    };
+
+    return {
+      totalTickets: agentTickets.length,
+      weeklyTickets: weeklyTickets.length,
+      weightedScore: Math.round(weightedTickets * 10) / 10,
+      weeklyWeighted: Math.round(weeklyWeighted * 10) / 10,
+      totalHours,
+      weeklyHours,
+      workloadPercentage: Math.round(workloadPercentage),
+      workloadStatus,
+      workloadColor,
+      priorityBreakdown
+    };
+  };
+
   return (
     <div className="min-h-screen p-6">
       {/* Header */}
@@ -150,6 +254,84 @@ const AgentsView = () => {
           </motion.button>
         </div>
       </motion.div>
+
+      {/* Workload Summary */}
+      {agents.length > 0 && tickets.length > 0 && (() => {
+        const activeAgents = agents.filter(a => a.active);
+        const workloads = activeAgents.map(agent => calculateWorkload(agent.name));
+        const avgWorkload = workloads.length > 0 
+          ? Math.round(workloads.reduce((sum, w) => sum + w.workloadPercentage, 0) / workloads.length)
+          : 0;
+        const overloadedCount = workloads.filter(w => w.workloadStatus === 'overloaded').length;
+        const highWorkloadCount = workloads.filter(w => w.workloadStatus === 'high').length;
+        const totalActiveTickets = workloads.reduce((sum, w) => sum + w.totalTickets, 0);
+        const totalWeeklyHours = workloads.reduce((sum, w) => sum + w.weeklyHours, 0);
+
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8 glass-card p-6"
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <FiTrendingUp className="text-2xl text-primary-600" />
+              <h2 className="text-2xl font-bold text-gray-800">Team Workload Overview</h2>
+            </div>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <div className="text-sm text-gray-600 mb-1">Average Workload</div>
+                <div className="text-3xl font-bold text-blue-600">{avgWorkload}%</div>
+              </div>
+              <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                <div className="text-sm text-gray-600 mb-1">Overloaded Agents</div>
+                <div className="text-3xl font-bold text-red-600">{overloadedCount}</div>
+              </div>
+              <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
+                <div className="text-sm text-gray-600 mb-1">High Workload</div>
+                <div className="text-3xl font-bold text-orange-600">{highWorkloadCount}</div>
+              </div>
+              <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                <div className="text-sm text-gray-600 mb-1">Weekly Hours</div>
+                <div className="text-3xl font-bold text-purple-600">{totalWeeklyHours}h</div>
+              </div>
+            </div>
+
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="text-sm font-semibold text-gray-700 mb-2">Workload Distribution</div>
+              <div className="space-y-2">
+                {activeAgents.map(agent => {
+                  const workload = calculateWorkload(agent.name);
+                  return (
+                    <div key={agent._id} className="flex items-center gap-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-sm font-medium text-gray-800 truncate">{agent.name}</span>
+                          <span className="text-xs font-bold text-gray-600">{workload.workloadPercentage}%</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div
+                            className={`h-full rounded-full ${
+                              workload.workloadColor === 'red' ? 'bg-red-500' :
+                              workload.workloadColor === 'orange' ? 'bg-orange-500' :
+                              workload.workloadColor === 'yellow' ? 'bg-yellow-500' :
+                              'bg-green-500'
+                            }`}
+                            style={{ width: `${Math.min(workload.workloadPercentage, 100)}%` }}
+                          />
+                        </div>
+                      </div>
+                      <div className="text-xs text-gray-600 w-16 text-right">
+                        {workload.totalTickets} tickets
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </motion.div>
+        );
+      })()}
 
       {/* Agents Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -217,11 +399,112 @@ const AgentsView = () => {
               </div>
             </div>
 
+            {/* Workload Section */}
+            {agent.active && (() => {
+              const workload = calculateWorkload(agent.name);
+              return (
+                <div className="pt-4 border-t border-gray-200 mb-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm font-semibold text-gray-700">Workload</span>
+                    <span className={`text-sm font-bold px-2 py-1 rounded ${
+                      workload.workloadColor === 'red' ? 'bg-red-100 text-red-700' :
+                      workload.workloadColor === 'orange' ? 'bg-orange-100 text-orange-700' :
+                      workload.workloadColor === 'yellow' ? 'bg-yellow-100 text-yellow-700' :
+                      'bg-green-100 text-green-700'
+                    }`}>
+                      {workload.workloadPercentage}%
+                    </span>
+                  </div>
+                  
+                  {/* Workload Progress Bar */}
+                  <div className="w-full bg-gray-200 rounded-full h-2.5 mb-3 overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${Math.min(workload.workloadPercentage, 100)}%` }}
+                      transition={{ duration: 0.5 }}
+                      className={`h-full rounded-full ${
+                        workload.workloadColor === 'red' ? 'bg-red-500' :
+                        workload.workloadColor === 'orange' ? 'bg-orange-500' :
+                        workload.workloadColor === 'yellow' ? 'bg-yellow-500' :
+                        'bg-green-500'
+                      }`}
+                    />
+                  </div>
+
+                  {/* Workload Stats */}
+                  <div className="grid grid-cols-2 gap-2 mb-3 text-xs">
+                    <div className="bg-gray-50 p-2 rounded">
+                      <div className="text-gray-600">Active Tickets</div>
+                      <div className="font-bold text-gray-800">{workload.totalTickets}</div>
+                    </div>
+                    <div className="bg-blue-50 p-2 rounded">
+                      <div className="text-gray-600">This Week</div>
+                      <div className="font-bold text-blue-600">{workload.weeklyTickets}</div>
+                    </div>
+                    <div className="bg-purple-50 p-2 rounded">
+                      <div className="text-gray-600">Est. Hours</div>
+                      <div className="font-bold text-purple-600">{workload.totalHours}h</div>
+                    </div>
+                    <div className="bg-indigo-50 p-2 rounded">
+                      <div className="text-gray-600">Weekly Hours</div>
+                      <div className="font-bold text-indigo-600">{workload.weeklyHours}h</div>
+                    </div>
+                  </div>
+
+                  {/* Priority Breakdown */}
+                  {workload.totalTickets > 0 && (
+                    <div className="mb-3">
+                      <div className="text-xs font-semibold text-gray-600 mb-1">Priority Breakdown</div>
+                      <div className="grid grid-cols-4 gap-1">
+                        <div className="bg-red-100 rounded p-1 text-center">
+                          <div className="text-xs font-bold text-red-700">{workload.priorityBreakdown.urgent}</div>
+                          <div className="text-[10px] text-gray-600">Urgent</div>
+                        </div>
+                        <div className="bg-orange-100 rounded p-1 text-center">
+                          <div className="text-xs font-bold text-orange-700">{workload.priorityBreakdown.high}</div>
+                          <div className="text-[10px] text-gray-600">High</div>
+                        </div>
+                        <div className="bg-yellow-100 rounded p-1 text-center">
+                          <div className="text-xs font-bold text-yellow-700">{workload.priorityBreakdown.medium}</div>
+                          <div className="text-[10px] text-gray-600">Med</div>
+                        </div>
+                        <div className="bg-gray-100 rounded p-1 text-center">
+                          <div className="text-xs font-bold text-gray-700">{workload.priorityBreakdown.low}</div>
+                          <div className="text-[10px] text-gray-600">Low</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Workload Status Message */}
+                  <div className={`text-xs text-center p-2 rounded ${
+                    workload.workloadStatus === 'overloaded' ? 'bg-red-50 text-red-700 border border-red-200' :
+                    workload.workloadStatus === 'high' ? 'bg-orange-50 text-orange-700 border border-orange-200' :
+                    workload.workloadStatus === 'medium' ? 'bg-yellow-50 text-yellow-700 border border-yellow-200' :
+                    'bg-green-50 text-green-700 border border-green-200'
+                  }`}>
+                    {workload.workloadStatus === 'overloaded' && (
+                      <span><FiAlertTriangle className="inline mr-1" /> Overloaded - Consider redistributing</span>
+                    )}
+                    {workload.workloadStatus === 'high' && (
+                      <span><FiTrendingUp className="inline mr-1" /> High workload</span>
+                    )}
+                    {workload.workloadStatus === 'medium' && (
+                      <span>Moderate workload</span>
+                    )}
+                    {workload.workloadStatus === 'low' && (
+                      <span>✓ Balanced workload</span>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
+
             {/* Stats */}
             <div className="grid grid-cols-2 gap-3 pt-4 border-t border-gray-200">
               <div className="bg-primary-50 p-3 rounded-lg text-center border border-primary-200">
                 <div className="text-2xl font-bold text-primary-600">{agent.ticketCount || 0}</div>
-                <div className="text-xs text-gray-600">Tickets</div>
+                <div className="text-xs text-gray-600">Total Tickets</div>
               </div>
               <div className={`p-3 rounded-lg text-center border ${
                 agent.active 
