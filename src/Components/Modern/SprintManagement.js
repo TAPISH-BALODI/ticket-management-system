@@ -23,10 +23,10 @@ const SprintManagement = () => {
 
   useEffect(() => {
     fetchTickets();
-    generateSprints();
     
     // Listen for ticket updates
     const handleTicketUpdate = () => {
+      console.log('SprintManagement: Received ticketsUpdated event, refreshing...');
       fetchTickets();
     };
     
@@ -37,12 +37,42 @@ const SprintManagement = () => {
     };
   }, [selectedSprintType]);
 
+  useEffect(() => {
+    // Generate sprints whenever sprint type changes
+    generateSprints();
+  }, [selectedSprintType]);
+
+  useEffect(() => {
+    // Log when tickets are updated
+    if (tickets.length > 0) {
+      console.log('SprintManagement: Tickets updated, current count:', tickets.length);
+      console.log('SprintManagement: Sample ticket dates:', tickets.slice(0, 3).map(t => ({
+        topic: t.topic,
+        dateCreated: t.dateCreated,
+        dateType: typeof t.dateCreated
+      })));
+    }
+  }, [tickets]);
+
   const fetchTickets = async () => {
     try {
+      console.log('SprintManagement: Fetching tickets from:', `${process.env.REACT_APP_BASE_URL}/api/all-tickets`);
       const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/all-tickets`);
+      console.log('SprintManagement: Received', response.data.length, 'tickets');
+      
+      // Log sample ticket to see date format
+      if (response.data.length > 0) {
+        console.log('SprintManagement: Sample ticket:', {
+          id: response.data[0]._id,
+          topic: response.data[0].topic,
+          dateCreated: response.data[0].dateCreated,
+          dateCreatedType: typeof response.data[0].dateCreated
+        });
+      }
+      
       setTickets(response.data);
     } catch (error) {
-      console.error('Error fetching tickets:', error);
+      console.error('SprintManagement: Error fetching tickets:', error);
     }
   };
 
@@ -98,19 +128,39 @@ const SprintManagement = () => {
   };
 
   const getSprintTickets = (sprint) => {
-    if (!tickets || tickets.length === 0) return [];
+    if (!tickets || tickets.length === 0) {
+      console.log('SprintManagement: No tickets available');
+      return [];
+    }
+    
+    console.log('SprintManagement: Processing', tickets.length, 'tickets for sprint', sprint.name);
     
     return tickets.filter(ticket => {
-      if (!ticket.dateCreated) return false;
+      if (!ticket.dateCreated) {
+        console.log('SprintManagement: Ticket missing dateCreated:', ticket._id, ticket.topic);
+        return false;
+      }
       
       try {
+        // Handle both Date objects and ISO strings
         const ticketDate = moment(ticket.dateCreated);
         const startDate = moment(sprint.startDate);
         const endDate = moment(sprint.endDate);
         
-        return ticketDate.isBetween(startDate, endDate, null, '[]');
+        if (!ticketDate.isValid()) {
+          console.log('SprintManagement: Invalid ticket date:', ticket.dateCreated);
+          return false;
+        }
+        
+        const isInSprint = ticketDate.isBetween(startDate, endDate, null, '[]');
+        
+        if (isInSprint) {
+          console.log('SprintManagement: Ticket matched sprint:', ticket.topic, 'Date:', ticketDate.format('YYYY-MM-DD'));
+        }
+        
+        return isInSprint;
       } catch (error) {
-        console.error('Error parsing ticket date:', ticket.dateCreated, error);
+        console.error('SprintManagement: Error parsing ticket date:', ticket.dateCreated, error);
         return false;
       }
     });
@@ -244,14 +294,22 @@ const SprintManagement = () => {
               }
               
               const allSprintTickets = tickets.filter(ticket => {
-                if (!ticket.dateCreated) return false;
+                if (!ticket.dateCreated) {
+                  return false;
+                }
                 try {
                   const ticketDate = moment(ticket.dateCreated);
-                  return sprints.some(sprint => {
+                  if (!ticketDate.isValid()) {
+                    return false;
+                  }
+                  
+                  const matches = sprints.some(sprint => {
                     const startDate = moment(sprint.startDate);
                     const endDate = moment(sprint.endDate);
                     return ticketDate.isBetween(startDate, endDate, null, '[]');
                   });
+                  
+                  return matches;
                 } catch (error) {
                   return false;
                 }

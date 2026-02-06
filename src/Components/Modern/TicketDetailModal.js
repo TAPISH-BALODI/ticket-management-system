@@ -23,6 +23,7 @@ const TicketDetailModal = ({ ticket, isOpen, onClose, onUpdate, agents }) => {
       );
       setIsEditing(false);
       onUpdate();
+      console.log('TicketDetailModal: Ticket updated, emitting ticketsUpdated event');
       eventBus.emit('ticketsUpdated');
       onClose();
     } catch (error) {
@@ -43,6 +44,7 @@ const TicketDetailModal = ({ ticket, isOpen, onClose, onUpdate, agents }) => {
       );
       setNewComment('');
       onUpdate();
+      console.log('TicketDetailModal: Comment added, emitting ticketsUpdated event');
       eventBus.emit('ticketsUpdated');
     } catch (error) {
       console.error('Error adding comment:', error);

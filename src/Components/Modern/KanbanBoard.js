@@ -112,6 +112,7 @@ const KanbanBoard = () => {
           }
         );
         // Emit event to notify other components
+        console.log('KanbanBoard: Ticket moved, emitting ticketsUpdated event');
         eventBus.emit('ticketsUpdated');
       } catch (error) {
         console.error('Error updating ticket:', error);

@@ -35,6 +35,7 @@ const CreateTicketModal = ({ isOpen, onClose, onSuccess, agents }) => {
 
     try {
       await axios.post(`${process.env.REACT_APP_BASE_URL}/api/support-tickets`, ticketData);
+      console.log('CreateTicketModal: Ticket created, emitting ticketsUpdated event');
       onSuccess();
       eventBus.emit('ticketsUpdated');
       onClose();

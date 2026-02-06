@@ -20,6 +20,7 @@ const QuickStats = ({ onViewChange }) => {
     
     // Listen for ticket updates
     const handleTicketUpdate = () => {
+      console.log('QuickStats: Received ticketsUpdated event, refreshing stats...');
       fetchStats();
     };
     
@@ -32,19 +33,25 @@ const QuickStats = ({ onViewChange }) => {
 
   const fetchStats = async () => {
     try {
+      console.log('QuickStats: Fetching stats...');
       const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/all-tickets`);
       const tickets = response.data;
       
       const now = new Date();
       const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
       
-      setStats({
-        active: tickets.filter(t => t.status !== 'Done').length,
-        thisWeek: tickets.filter(t => new Date(t.dateCreated) >= weekAgo).length,
-        completed: tickets.filter(t => t.status === 'Done').length
-      });
+      const active = tickets.filter(t => t.status !== 'Done').length;
+      const thisWeek = tickets.filter(t => {
+        const ticketDate = new Date(t.dateCreated);
+        return ticketDate >= weekAgo;
+      }).length;
+      const completed = tickets.filter(t => t.status === 'Done').length;
+      
+      console.log('QuickStats: Updated stats:', { active, thisWeek, completed });
+      
+      setStats({ active, thisWeek, completed });
     } catch (error) {
-      console.error('Error fetching stats:', error);
+      console.error('QuickStats: Error fetching stats:', error);
     }
   };
 
