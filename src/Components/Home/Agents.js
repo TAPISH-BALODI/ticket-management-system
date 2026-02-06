@@ -1,5 +1,4 @@
 import React,{useEffect,useState} from 'react'
-import * as moment from 'moment'
 import {Table} from 'reactstrap'
 
 import axios from 'axios'
