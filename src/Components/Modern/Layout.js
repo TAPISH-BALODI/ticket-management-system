@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  FiHome, FiGrid, FiUsers, FiCalendar, FiSettings,
-  FiMenu, FiX, FiSun, FiMoon
+  FiHome, FiUsers,
+  FiMenu, FiX
 } from 'react-icons/fi';
 import { BsKanban, BsLightningChargeFill } from 'react-icons/bs';
 import axios from 'axios';

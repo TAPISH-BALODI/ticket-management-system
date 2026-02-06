@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  FiX, FiEdit3, FiSave, FiTrash2, FiUser, FiClock, 
-  FiTag, FiAlertCircle, FiMessageSquare, FiCalendar,
-  FiCheckCircle, FiLink
+  FiX, FiEdit3, FiSave, FiUser, FiClock, 
+  FiTag, FiAlertCircle, FiMessageSquare,
+  FiCheckCircle
 } from 'react-icons/fi';
 import axios from 'axios';
 import * as moment from 'moment';

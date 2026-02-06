@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
-  FiCalendar, FiPlus, FiClock, FiCheckCircle, FiTrendingUp,
+  FiCalendar, FiClock, FiCheckCircle, FiTrendingUp,
   FiFilter, FiList
 } from 'react-icons/fi';
 import { BsLightningChargeFill } from 'react-icons/bs';
@@ -13,13 +13,6 @@ const SprintManagement = () => {
   const [sprints, setSprints] = useState([]);
   const [tickets, setTickets] = useState([]);
   const [selectedSprintType, setSelectedSprintType] = useState('weekly');
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [newSprint, setNewSprint] = useState({
-    name: '',
-    startDate: '',
-    endDate: '',
-    type: 'weekly'
-  });
 
   useEffect(() => {
     fetchTickets();
@@ -40,6 +33,7 @@ const SprintManagement = () => {
   useEffect(() => {
     // Generate sprints whenever sprint type changes
     generateSprints();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedSprintType]);
 
   useEffect(() => {
