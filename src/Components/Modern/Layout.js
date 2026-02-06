@@ -6,6 +6,7 @@ import {
 } from 'react-icons/fi';
 import { BsKanban, BsLightningChargeFill } from 'react-icons/bs';
 import axios from 'axios';
+import eventBus from '../../utils/eventBus';
 
 const QuickStats = ({ onViewChange }) => {
   const [stats, setStats] = useState({
@@ -16,6 +17,17 @@ const QuickStats = ({ onViewChange }) => {
 
   useEffect(() => {
     fetchStats();
+    
+    // Listen for ticket updates
+    const handleTicketUpdate = () => {
+      fetchStats();
+    };
+    
+    eventBus.on('ticketsUpdated', handleTicketUpdate);
+    
+    return () => {
+      eventBus.off('ticketsUpdated', handleTicketUpdate);
+    };
   }, []);
 
   const fetchStats = async () => {

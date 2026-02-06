@@ -7,6 +7,7 @@ import {
 } from 'react-icons/fi';
 import axios from 'axios';
 import * as moment from 'moment';
+import eventBus from '../../utils/eventBus';
 
 const TicketDetailModal = ({ ticket, isOpen, onClose, onUpdate, agents }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -22,6 +23,7 @@ const TicketDetailModal = ({ ticket, isOpen, onClose, onUpdate, agents }) => {
       );
       setIsEditing(false);
       onUpdate();
+      eventBus.emit('ticketsUpdated');
       onClose();
     } catch (error) {
       console.error('Error updating ticket:', error);
@@ -41,6 +43,7 @@ const TicketDetailModal = ({ ticket, isOpen, onClose, onUpdate, agents }) => {
       );
       setNewComment('');
       onUpdate();
+      eventBus.emit('ticketsUpdated');
     } catch (error) {
       console.error('Error adding comment:', error);
     }

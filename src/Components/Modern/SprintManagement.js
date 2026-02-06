@@ -7,6 +7,7 @@ import {
 import { BsLightningChargeFill } from 'react-icons/bs';
 import axios from 'axios';
 import * as moment from 'moment';
+import eventBus from '../../utils/eventBus';
 
 const SprintManagement = () => {
   const [sprints, setSprints] = useState([]);
@@ -23,6 +24,17 @@ const SprintManagement = () => {
   useEffect(() => {
     fetchTickets();
     generateSprints();
+    
+    // Listen for ticket updates
+    const handleTicketUpdate = () => {
+      fetchTickets();
+    };
+    
+    eventBus.on('ticketsUpdated', handleTicketUpdate);
+    
+    return () => {
+      eventBus.off('ticketsUpdated', handleTicketUpdate);
+    };
   }, [selectedSprintType]);
 
   const fetchTickets = async () => {
@@ -86,9 +98,21 @@ const SprintManagement = () => {
   };
 
   const getSprintTickets = (sprint) => {
+    if (!tickets || tickets.length === 0) return [];
+    
     return tickets.filter(ticket => {
-      const ticketDate = moment(ticket.dateCreated);
-      return ticketDate.isBetween(sprint.startDate, sprint.endDate, null, '[]');
+      if (!ticket.dateCreated) return false;
+      
+      try {
+        const ticketDate = moment(ticket.dateCreated);
+        const startDate = moment(sprint.startDate);
+        const endDate = moment(sprint.endDate);
+        
+        return ticketDate.isBetween(startDate, endDate, null, '[]');
+      } catch (error) {
+        console.error('Error parsing ticket date:', ticket.dateCreated, error);
+        return false;
+      }
     });
   };
 
@@ -208,11 +232,29 @@ const SprintManagement = () => {
           <h3 className="text-xl font-bold text-gray-800 mb-4">Sprint Overview</h3>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {(() => {
-              const allSprintTickets = tickets.filter(ticket => {
-                const ticketDate = moment(ticket.dateCreated);
-                return sprints.some(sprint => 
-                  ticketDate.isBetween(sprint.startDate, sprint.endDate, null, '[]')
+              if (!tickets || tickets.length === 0 || !sprints || sprints.length === 0) {
+                return (
+                  <>
+                    <div className="text-center"><div className="text-3xl font-bold text-blue-600">0</div><div className="text-sm text-gray-600">Total Sprint Tickets</div></div>
+                    <div className="text-center"><div className="text-3xl font-bold text-green-600">0</div><div className="text-sm text-gray-600">Completed</div></div>
+                    <div className="text-center"><div className="text-3xl font-bold text-purple-600">0</div><div className="text-sm text-gray-600">Active Sprints</div></div>
+                    <div className="text-center"><div className="text-3xl font-bold text-orange-600">0%</div><div className="text-sm text-gray-600">Avg Completion</div></div>
+                  </>
                 );
+              }
+              
+              const allSprintTickets = tickets.filter(ticket => {
+                if (!ticket.dateCreated) return false;
+                try {
+                  const ticketDate = moment(ticket.dateCreated);
+                  return sprints.some(sprint => {
+                    const startDate = moment(sprint.startDate);
+                    const endDate = moment(sprint.endDate);
+                    return ticketDate.isBetween(startDate, endDate, null, '[]');
+                  });
+                } catch (error) {
+                  return false;
+                }
               });
               
               const totalTickets = allSprintTickets.length;

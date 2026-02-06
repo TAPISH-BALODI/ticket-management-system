@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiX, FiSave, FiTag, FiUser, FiAlertCircle, FiClock } from 'react-icons/fi';
 import axios from 'axios';
+import eventBus from '../../utils/eventBus';
 
 const CreateTicketModal = ({ isOpen, onClose, onSuccess, agents }) => {
   const [ticketData, setTicketData] = useState({
@@ -35,6 +36,7 @@ const CreateTicketModal = ({ isOpen, onClose, onSuccess, agents }) => {
     try {
       await axios.post(`${process.env.REACT_APP_BASE_URL}/api/support-tickets`, ticketData);
       onSuccess();
+      eventBus.emit('ticketsUpdated');
       onClose();
       
       // Reset form

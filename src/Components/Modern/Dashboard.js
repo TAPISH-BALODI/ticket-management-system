@@ -6,6 +6,7 @@ import {
 } from 'react-icons/fi';
 import { BsGraphUpArrow } from 'react-icons/bs';
 import axios from 'axios';
+import eventBus from '../../utils/eventBus';
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -27,6 +28,17 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchData();
+    
+    // Listen for ticket updates
+    const handleTicketUpdate = () => {
+      fetchData();
+    };
+    
+    eventBus.on('ticketsUpdated', handleTicketUpdate);
+    
+    return () => {
+      eventBus.off('ticketsUpdated', handleTicketUpdate);
+    };
   }, []);
 
   const calculatePercentageChange = (current, previous) => {

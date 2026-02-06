@@ -9,6 +9,7 @@ import { BsKanban } from 'react-icons/bs';
 import axios from 'axios';
 import TicketDetailModal from './TicketDetailModal';
 import CreateTicketModal from './CreateTicketModal';
+import eventBus from '../../utils/eventBus';
 
 const KanbanBoard = () => {
   const [tickets, setTickets] = useState({
@@ -25,11 +26,6 @@ const KanbanBoard = () => {
     sprint: ''
   });
   const [agents, setAgents] = useState([]);
-
-  useEffect(() => {
-    fetchTickets();
-    fetchAgents();
-  }, [filters]);
 
   const fetchTickets = async () => {
     try {
@@ -56,6 +52,22 @@ const KanbanBoard = () => {
       console.error('Error fetching tickets:', error);
     }
   };
+
+  useEffect(() => {
+    fetchTickets();
+    fetchAgents();
+    
+    // Listen for ticket updates from other components
+    const handleTicketUpdate = () => {
+      fetchTickets();
+    };
+    
+    eventBus.on('ticketsUpdated', handleTicketUpdate);
+    
+    return () => {
+      eventBus.off('ticketsUpdated', handleTicketUpdate);
+    };
+  }, [filters]);
 
   const fetchAgents = async () => {
     try {
@@ -99,6 +111,8 @@ const KanbanBoard = () => {
             position: destination.index
           }
         );
+        // Emit event to notify other components
+        eventBus.emit('ticketsUpdated');
       } catch (error) {
         console.error('Error updating ticket:', error);
       }
