@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   FiUsers, FiPlus, FiMail, FiPhone, FiEdit, FiTrash2,
-  FiCheckCircle, FiClock, FiAlertTriangle, FiTrendingUp
+  FiCheckCircle, FiAlertTriangle, FiTrendingUp
 } from 'react-icons/fi';
 import axios from 'axios';
 import eventBus from '../../utils/eventBus';
@@ -264,7 +264,6 @@ const AgentsView = () => {
           : 0;
         const overloadedCount = workloads.filter(w => w.workloadStatus === 'overloaded').length;
         const highWorkloadCount = workloads.filter(w => w.workloadStatus === 'high').length;
-        const totalActiveTickets = workloads.reduce((sum, w) => sum + w.totalTickets, 0);
         const totalWeeklyHours = workloads.reduce((sum, w) => sum + w.weeklyHours, 0);
 
         return (
