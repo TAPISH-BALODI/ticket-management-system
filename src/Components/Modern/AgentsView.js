@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   FiUsers, FiPlus, FiMail, FiPhone, FiEdit, FiTrash2,
-  FiCheckCircle, FiActivity
+  FiCheckCircle
 } from 'react-icons/fi';
 import axios from 'axios';
 

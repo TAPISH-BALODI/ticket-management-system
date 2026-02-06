@@ -39,6 +39,7 @@ const Dashboard = () => {
     return () => {
       eventBus.off('ticketsUpdated', handleTicketUpdate);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const calculatePercentageChange = (current, previous) => {

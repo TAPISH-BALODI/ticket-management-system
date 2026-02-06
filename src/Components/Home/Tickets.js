@@ -42,6 +42,7 @@ const fetchTickets= async ()=>{
   useEffect(()=>{
     fetchTickets()
     fetchAgents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }
   ,[status,severity,assignedTo,sort])
 

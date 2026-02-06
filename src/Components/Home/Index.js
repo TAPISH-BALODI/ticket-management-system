@@ -9,13 +9,6 @@ export default function Index() {
 
   const [tab,setTab]=useState(0)
 
-  const [agentData, setAgentData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    description: '',
-  });
-
 
 
 

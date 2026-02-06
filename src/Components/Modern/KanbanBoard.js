@@ -3,7 +3,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FiClock, FiUser, FiAlertCircle, FiCheckCircle, 
-  FiEdit, FiTrash2, FiPlus, FiFilter 
+  FiEdit, FiPlus, FiFilter 
 } from 'react-icons/fi';
 import { BsKanban } from 'react-icons/bs';
 import axios from 'axios';
@@ -67,6 +67,7 @@ const KanbanBoard = () => {
     return () => {
       eventBus.off('ticketsUpdated', handleTicketUpdate);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
   const fetchAgents = async () => {
